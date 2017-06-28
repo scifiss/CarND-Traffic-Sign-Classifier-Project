@@ -40,24 +40,25 @@ You're reading it! And here is a link to my [project code](https://github.com/sc
 
 ####1. Provide a basic summary of the data set. In the code, the analysis should be done using python, numpy and/or pandas methods rather than hardcoding results manually.
 
-I used the pandas library to calculate summary statistics of the traffic signs data set:
+I calculate summary statistics of the traffic signs data set:
 
-![alt text](datasetall.png)
+![alt text](/examples/datasetall.png)
 * The size of training set is 34799
 * The size of the validation set is 4410
 * The size of test set is 12630
 * The shape of a traffic sign image is (32,32,3)
 * The number of unique classes/labels in the data set is 43
+Definition of all classes can be found at signnames.csv
 
 #### 2. Include an exploratory visualization of the dataset.
 
 For a small set of randomly selected classes, 3 sample images are randomly selected to show how they vary in brightness, size, color, and shapes.
 
-![alt text](dataset_compare.png)
+![alt text](/examples/dataset_compare.png)
 
 A bar chart shows numbers of images belonging to each class in the training, validation, and test dataset.
 
-![alt text](datasethist.png)
+![alt text](/examples/datasethist.png)
 
 
 ### Design and Test a Model Architecture
@@ -65,24 +66,35 @@ A bar chart shows numbers of images belonging to each class in the training, val
 #### 1) Describe how you preprocessed the image data.
 What techniques were chosen and why did you choose these techniques? Consider including images showing the output of each preprocessing technique. Pre-processing refers to techniques such as converting to grayscale, normalization, etc. (OPTIONAL: As described in the "Stand Out Suggestions" part of the rubric, if you generated additional data for training, describe why you decided to generate additional data, how you generated the data, and provide example images of the additional data. Then describe the characteristics of the augmented training set like number of images in the set, number of images for each class, etc.)
 
-As a first step, I decided to normalize the images because for each class, the included images vary a lot in the brightness. 
+(1) Normalize the image
+
+I decided to normalize the images because for each class, the included images vary a lot in the brightness. 
 Two approaches are attempted to normalize images:
-(1) The image is converted to grayscale or intensity from (i.e. YUV, HSV, YCrCb), being equalized, and then converted back to RGB. Except YUV, the other colorspaces (i.e. HSV, YCrCb) resulted in weird color tones. For YUV normalization, the resulted RGB shows many dark patterns from the original light noises.
-(2) The image is normalized per color channel, so information from each color is honored. The processed images look better. I hereinafter normalize with second approach. 
+  (a) The image is converted to grayscale or intensity from (i.e. YUV, HSV, YCrCb), being equalized, and then converted back to RGB. Except YUV, the other colorspaces (i.e. HSV, YCrCb) resulted in weird color tones. For YUV normalization, the resulted RGB shows many dark patterns from the original light noises.
+  (b) The image is normalized per color channel, so information from each color is honored. The processed images look better. I hereinafter normalize with second approach. 
 In the plot below, first column is raw data, 2nd column is normalized in YUV space, 3rd column is normalized for each color.
-![alt text][normalizing.png]
+![alt text][/examples/normalizing.png]
 
-As a last step, I normalized the image data because ...
+(2) Enhance the image
 
-I decided to generate additional data because ... 
+After normalization for individual channels, edge enhancing filters of different sizes are attempted since many images are blurred. In the plot below, first column is raw data, 2nd column is normalized data, 3rd column is applied with size=3 filter, and last column is applied with size=5 filter.
+![alt text](/edgeEnhancing.png)
+Seemingly, edge detector does improve the image quality, and the one with size = 5 produces clearer images, but will also emphasize background edges and introduce artificial effect, like the darker edges around the arrow in the last image,and the middle in the 5th image. I am not sure if these effects will harm the learning process.
+In the part of results and discussion, several runs are carried to see their effects on class recogniztion. It is seen that although an edge enhancing of size=5 improve the image visually, it deteriorates the classification. Edge enhancing with size=3 doesn't remarkably improve the classification. So in the final run, only normalization is used in preprocessing.
 
-To add more data to the the data set, I used the following techniques because ... 
+(3) Obtain ROI
 
-Here is an example of an original image and an augmented image:
+I noticed in the German traffic sign website (http://benchmark.ini.rub.de/?section=gtsrb&subsection=dataset#Annotationformat), the coordinates of region of interest (ROI) for the sign are offered. The coordinates are also included in our dataset. I would take advantage of the information and cut ROI out for recognition.
+![alt text](/Roi.png)
 
-![alt text][image3]
+(4) Image augmentation
 
-The difference between the original data set and the augmented data set is the following ... 
+I decided to generate additional data because from the histogram we know the training dataset is very unbalanced. For those "minor" classes with little images, the probability of judging a new image as minor classes is small from learning. The objective is increasing minor class data so in the training set, all classes have almost equal data.
+skimage.transform is used to combine all kinds of random transformation into one step. Thus the speed should be increased than consecutive image transformation.
+Suplementrary images are added to original train dataset. For each "minor" class, i.e. class with less images, original images in the training dataset are selected randomly, underthrough scaling, rotation, shearing and translation to generate complementary images up to the size of 0.9 of the class with maximum sample size. 
+Here is an example of an original image and augmented images:
+![alt text] (/examples/dataset_augmented.png)
+The final result, shown on another file Traffic_Sign_Classifier_rebecca_withExtraImages.ipynb, is terrible. Therefore it is abandoned in my main workflow.
 
 
 #### 2) Describe what your final model architecture looks like including model type, layers, layer sizes, connectivity, etc.) Consider including a diagram and/or table describing the final model.
@@ -92,15 +104,20 @@ My final model consisted of the following layers:
 | Layer         		|     Description	        					| 
 |:---------------------:|:---------------------------------------------:| 
 | Input         		| 32x32x3 RGB image   							| 
-| Convolution 3x3     	| 1x1 stride, same padding, outputs 32x32x64 	|
+| Convolution 5x5     	| 1x1 stride, valid padding, outputs 28x28x12 	|
 | RELU					|												|
-| Max pooling	      	| 2x2 stride,  outputs 16x16x64 				|
-| Convolution 3x3	    | etc.      									|
-| Fully connected		| etc.        									|
-| Softmax				| etc.        									|
-|						|												|
-|						|												|
- 
+| Max pooling	      	| 2x2 stride,  outputs 14x14x12 				|
+| Convolution 5x5	    | 1x1 stride, valid padding, outputs 10x10x32 	|
+| RELU					|												|
+| Max pooling	      	| 2x2 stride,  outputs 5x5x32   				|
+| Flatten               | outputs 800                                   |
+| Fully connected		| outptus 360  									|
+| RELU					|												|
+| dropout    	      	| with input variable keep_prob3 				|
+| Fully connected		| outptus 120  									|
+| RELU					|												|
+| dropout    	      	| with input variable keep_prob4 				|
+| Fully connected		| outptus 43  									|
 
 
 #### 3. Describe how you trained your model. The discussion can include the type of optimizer, the batch size, number of epochs and any hyperparameters such as learning rate.
