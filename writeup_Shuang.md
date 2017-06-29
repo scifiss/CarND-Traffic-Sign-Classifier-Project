@@ -226,7 +226,9 @@ When dropouts are inserted between fully connected layers, the starting accuracy
 8. Batch normalization
 From above realizations, I see the validation accuracy can change in a big range or stabalize at a level with no apparent improvement. It is because the model parameters change due to the distributions of outputs in each layer. These parameter change is like a noise to learning in later layers (https://r2rt.com/implementing-batch-normalization-in-tensorflow.html). I gave the batch normalization for several trials, but the result is very bad, time consuming and accuracy not increasing monotonically at all. After 100 epochs, the validation accuracy =0.697. I guess the convolutional layer has too many units, and maybe my implementation of batch normalization is wrong.
 
-|:----------------Batch normalization-------------------------------:| 
+#### Batch normalization
+
+'''python
 def batch_norm_wrapper(inputs, is_training, decay = 0.999, epsilon = 1e-3):
 
     scale = tf.Variable(tf.ones([inputs.get_shape()[-1]]))
@@ -245,8 +247,10 @@ def batch_norm_wrapper(inputs, is_training, decay = 0.999, epsilon = 1e-3):
                 batch_mean, batch_var, beta, scale, epsilon)
     else:
         return tf.nn.batch_normalization(inputs,
-            pop_mean, pop_var, beta, scale, epsilon)            
-|:----------------Lenet with BN-------------------------------:| 
+            pop_mean, pop_var, beta, scale, epsilon)      
+'''            
+#### Lenet with BN
+'''python
 def LeNet(x, is_training):    
     #  Layer 1: Convolutional. Input = 32x32x3. Output = 32*32*32
     #  Pooling. Input = 32*32*32. Output = 16*16*32   
@@ -338,8 +342,7 @@ def LeNet(x, is_training):
     logits = tf.matmul(fc2_bn, fc3_W) + fc3_b
     
     return logits            
-|:----------------Lenet with BN-------------------------------:| 
-
+'''
  
 
 ### Test a Model on New Images
