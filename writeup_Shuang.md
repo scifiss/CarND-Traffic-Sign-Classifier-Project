@@ -62,7 +62,8 @@ Two approaches are attempted to normalize images:
   (a) The image is converted to grayscale or intensity from (i.e. YUV, HSV, YCrCb), being equalized, and then converted back to RGB. Except YUV, the other colorspaces (i.e. HSV, YCrCb) resulted in weird color tones. For YUV normalization, the resulted RGB shows many dark patterns from the original light noises.
   (b) The image is normalized per color channel, so information from each color is honored. The processed images look better. I hereinafter normalize with second approach. 
 In the plot below, first column is raw data, 2nd column is normalized in YUV space, 3rd column is normalized for each color.
-![alt text][/examples/normalizing.png]
+
+![alt text](/examples/normalizing.png)
 
 (2) Enhance the image
 
@@ -82,8 +83,11 @@ I decided to generate additional data because from the histogram we know the tra
 skimage.transform is used to combine all kinds of random transformation into one step. Thus the speed should be increased than consecutive image transformation.
 Suplementrary images are added to original train dataset. For each "minor" class, i.e. class with less images, original images in the training dataset are selected randomly, underthrough scaling, rotation, shearing and translation to generate complementary images up to the size of 0.9 of the class with maximum sample size. 
 Here is an example of an original image and augmented images:
+
 ![alt text](/examples/dataset_augmented.png)
+
 The final result, shown on another file Traffic_Sign_Classifier_rebecca_withExtraImages.ipynb, is terrible. Therefore it is abandoned in my main workflow.
+
 ![alt text](/examples/resultExtraimage.png)
 
 #### 2) Describe what your final model architecture looks like including model type, layers, layer sizes, connectivity, etc.) Consider including a diagram and/or table describing the final model.
@@ -107,7 +111,10 @@ My final model consisted of the following layers:
 | RELU					|												|
 | dropout    	      	| with input variable keep_prob4 				|
 | Fully connected		| outptus 43  									|
+The validation accuracy vs training accuracy, as well as the loss are shown below:
 
+![alt text](/examples/finalAccuracy.png)
+![alt text](/examples/finalLoss.png)
 
 #### 3. Describe how you trained your model. The discussion can include the type of optimizer, the batch size, number of epochs and any hyperparameters such as learning rate.
 
@@ -307,9 +314,15 @@ def LeNet(x, is_training):
 
 Here are five German traffic signs that I found on the web:
 
-![alt text][/new-image/c1.jpg] ![alt text][/new-image/c11.jpg] ![alt text][/new-image/c14.jpg] 
-![alt text][/new-image/c15.jpg] ![alt text][/new-image/c18.jpg] ![alt text][/new-image/c20.jpg]
-![alt text][/new-image/c23.jpg] ![alt text][/new-image/c24.jpg] ![alt text][/new-image/c27.jpg]
+![alt text][/new-image/c1.jpg] 
+![alt text][/new-image/c11.jpg] 
+![alt text][/new-image/c14.jpg] 
+![alt text][/new-image/c15.jpg] 
+![alt text][/new-image/c18.jpg] 
+![alt text][/new-image/c20.jpg]
+![alt text][/new-image/c23.jpg] 
+![alt text][/new-image/c24.jpg] 
+![alt text][/new-image/c27.jpg]
 
 They are cut with ROI and resized to 32*32*3.
 ![alt text](/examples/newimages.png)
