@@ -315,13 +315,21 @@ def LeNet(x, is_training):
 Here are five German traffic signs that I found on the web:
 
 ![alt text][/new-image/c1.jpg] 
+
 ![alt text][/new-image/c11.jpg] 
+
 ![alt text][/new-image/c14.jpg] 
+
 ![alt text][/new-image/c15.jpg] 
+
 ![alt text][/new-image/c18.jpg] 
+
 ![alt text][/new-image/c20.jpg]
+
 ![alt text][/new-image/c23.jpg] 
+
 ![alt text][/new-image/c24.jpg] 
+
 ![alt text][/new-image/c27.jpg]
 
 They are cut with ROI and resized to 32*32*3.
