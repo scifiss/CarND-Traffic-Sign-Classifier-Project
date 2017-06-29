@@ -15,17 +15,6 @@ The goals / steps of this project are the following:
 * Summarize the results with a written report
 
 
-# (Image References)
-
-[image1]: /examples/visualization.jpg 
-[image2]: ./examples/grayscale.jpg "Grayscaling"
-[image3]: ./examples/random_noise.jpg "Random Noise"
-[image4]: ./examples/placeholder.png "Traffic Sign 1"
-[image5]: ./examples/placeholder.png "Traffic Sign 2"
-[image6]: ./examples/placeholder.png "Traffic Sign 3"
-[image7]: ./examples/placeholder.png "Traffic Sign 4"
-[image8]: ./examples/placeholder.png "Traffic Sign 5"
-
 ## Rubric Points
 ### Here I will consider the [rubric points](https://review.udacity.com/#!/rubrics/481/view) individually and describe how I addressed each point in my implementation.  
 
@@ -93,9 +82,9 @@ I decided to generate additional data because from the histogram we know the tra
 skimage.transform is used to combine all kinds of random transformation into one step. Thus the speed should be increased than consecutive image transformation.
 Suplementrary images are added to original train dataset. For each "minor" class, i.e. class with less images, original images in the training dataset are selected randomly, underthrough scaling, rotation, shearing and translation to generate complementary images up to the size of 0.9 of the class with maximum sample size. 
 Here is an example of an original image and augmented images:
-![alt text] (/examples/dataset_augmented.png)
+![alt text](/examples/dataset_augmented.png)
 The final result, shown on another file Traffic_Sign_Classifier_rebecca_withExtraImages.ipynb, is terrible. Therefore it is abandoned in my main workflow.
-
+![alt text](/examples/resultExtraimage.png)
 
 #### 2) Describe what your final model architecture looks like including model type, layers, layer sizes, connectivity, etc.) Consider including a diagram and/or table describing the final model.
 
@@ -162,7 +151,7 @@ It's noticed in the German traffic sign website (http://benchmark.ini.rub.de/?se
 
 4. Increase Neuron numbers (convolution neurons)
 (1) first trial:
-|:------------------------------------------------------------------:| 
+
 Layer 1: Convolutional. Input = 32x32x3. Output = 28x28x12.
 Pooling. Input = 28x28x12. Output = 14x14x12    .
 Layer 2: Convolutional. Output = 10x10x32.
@@ -170,10 +159,10 @@ Pooling. Input = 10x10x32. Output = 5x5x32.
 Layer 3: Fully Connected. Input = 800. Output = 120.
 Layer 4: Fully Connected. Input = 120. Output = 84
 Layer 5: Fully Connected. Input = 84. Output = 43.
-|:------------------------------------------------------------------:| 
+
 After 29 epochs, test accuracy=0.929 with validation accuracy=0.951
 I also tried other structures
-|:------------------------------------------------------------------:| 
+
 Layer 1: Convolutional. Input = 32x32x3. Output = 32*32*32
 Pooling. Input = 32*32*32. Output = 16*16*32   
 Layer 2: Convolutional. 16*16*32  Output = 16*16*64.
@@ -182,11 +171,11 @@ Layer 3: Input: 8*8*64  Output: 8*8*128
 Pooling. Input = 8*8*128  Output = 8*8*128.
 Flatten. Input = 8*8*128. Output = 8192.
 Fully connected: 8192 -> 2048 -> 512 -> 43
-|:------------------------------------------------------------------:| 
+
 The results are terrible. Validation accuracy hangs around 0.07 to 0.17.
 
 5. Increase number of fully connected layer
-|:------------------------------------------------------------------:| 
+
 Layer 1: Convolutional. Input = 32x32x3. Output = 28x28x12.
 Pooling. Input = 28x28x12. Output = 14x14x12    .
 Layer 2: Convolutional. Output = 10x10x32.
@@ -195,12 +184,12 @@ Layer 3: Fully Connected. Input = 800. Output = 560.
 Layer 4: Fully Connected. Input = 560. Output = 320
 Layer 5: Fully Connected. Input = 320. Output = 120.
 Layer 5: Fully Connected. Input = 120. Output = 43.
-|:------------------------------------------------------------------:| 
+
 After 79 epochs, validation accuracy is 0.953, and test accuracy = 0.929. The validation accuracy arrives 0.95 for five times, but test accuracy is 0.929, meaning overfitting.
 #### Increase hidden number of units in convoluted layers or fully connected layers both don’t add any benefits -- actually they degrade the accuracy. Add a fully-connected layer doesn’t improve the results.
 
 6. Add convolutional layers
-|:------------------------------------------------------------------:| 
+
 Layer 1: Convolutional. Input = 32x32x3. Output = 28x28x6.
 Activation
 Pooling: Input = 28x28x6. Output = 14x14x6
@@ -216,7 +205,7 @@ Activation
 Layer 4: Fully Connected. Input = 120. Output = 84.
 Activation
 Layer 5: Fully Connected. Input = 84. Output = 43.
-|:------------------------------------------------------------------:| 
+
 After 82 epochs, validation accuracy reaches 0.942. It enters plateau as early as Epoch=30, and lingers between 0.93 and 0.05.
 I also add two more convolutional layers, which are completely no good. The validation accuracy keeps at low levels (<87%)
 
@@ -228,7 +217,7 @@ From above realizations, I see the validation accuracy can change in a big range
 
 #### Batch normalization
 
-'''python
+
 def batch_norm_wrapper(inputs, is_training, decay = 0.999, epsilon = 1e-3):
 
     scale = tf.Variable(tf.ones([inputs.get_shape()[-1]]))
@@ -248,9 +237,9 @@ def batch_norm_wrapper(inputs, is_training, decay = 0.999, epsilon = 1e-3):
     else:
         return tf.nn.batch_normalization(inputs,
             pop_mean, pop_var, beta, scale, epsilon)      
-'''            
+          
 #### Lenet with BN
-'''python
+
 def LeNet(x, is_training):    
     #  Layer 1: Convolutional. Input = 32x32x3. Output = 32*32*32
     #  Pooling. Input = 32*32*32. Output = 16*16*32   
@@ -263,86 +252,53 @@ def LeNet(x, is_training):
     # Arguments used for tf.truncated_normal, randomly defines variables for the weights and biases for each layer
     mu = 0
     sigma = 0.1
-    #epsilon = 1e-3
     
-    # SOLUTION: Layer 1: Convolutional. Input = 32x32x3. Output = 32*32*32.
     conv1_W = tf.Variable(tf.truncated_normal(shape=(5, 5, 3, 32), mean = mu, stddev = sigma))
-#    conv1_b = tf.Variable(tf.zeros(32))
     conv1   = tf.nn.conv2d(x, conv1_W, strides=[1, 1, 1, 1], padding='SAME')
     
     conv1_bn = tf.contrib.layers.batch_norm(conv1, data_format='NHWC', center=True, scale=True, is_training=is_training)
     
-
-    # SOLUTION: Activation.
     conv1_bn = tf.nn.relu(conv1_bn)
-    #conv1 = tf.nn.dropout(conv1, keep_prob1)
-
-    # Pooling. Input = 32*32*32. Output = 16*16*32    .
     conv1_bn = tf.nn.max_pool(conv1_bn, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
-#    print("conv1 shape =", conv1.shape)  
-        
-    # SOLUTION: Layer 2: Convolutional. 16*16*32  Output = 16*16*64.
     conv2_W = tf.Variable(tf.truncated_normal(shape=(5, 5, 32, 64), mean = mu, stddev = sigma))
     conv2_b = tf.Variable(tf.zeros(64))
     conv2   = tf.nn.conv2d(conv1_bn, conv2_W, strides=[1, 1, 1, 1], padding='SAME') + conv2_b
     conv2_bn = tf.contrib.layers.batch_norm(conv2, data_format='NHWC', center=True, scale=True, is_training=is_training)
-#    print("conv2 shape after conv2d:", conv2.shape)
-    # SOLUTION: Activation.
+
     conv2_bn = tf.nn.relu(conv2_bn)
-    #conv2 = tf.nn.dropout(conv2, keep_prob2)
-#    print("conv2 shape after relu:", conv2.shape)
 
-    # SOLUTION: Pooling. Input = 16*16*64.. Output = 8*8*64.
     conv2_bn = tf.nn.max_pool(conv2_bn, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
-#    print("conv2 shape after maxpool", conv2.shape)
 
-    # Input: 8*8*64  Output: 8*8*128
     conv3_W = tf.Variable(tf.truncated_normal(shape=(5, 5, 64, 512), mean = mu, stddev = sigma))
     conv3_b = tf.Variable(tf.zeros(512))
     conv3   = tf.nn.conv2d(conv2_bn, conv3_W, strides=[1, 1, 1, 1], padding='SAME') + conv3_b
     conv3_bn = tf.contrib.layers.batch_norm(conv3, data_format='NHWC', center=True, scale=True, is_training=is_training)
-    # SOLUTION: Activation.
     conv3_bn = tf.nn.relu(conv3_bn)    
 
-    # SOLUTION: Pooling. Input = 8*8*128  Output = 4*4*512.
     conv3_bn = tf.nn.max_pool(conv3_bn, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
-#    print("conv3 shape after maxpool", conv3.shape)
 
-
-    # SOLUTION: Flatten. Input = 4*4*512. Output = 8192.
     fc0   = flatten(conv3_bn)
-    print(conv3.shape)
-    # SOLUTION: Layer 3: Fully Connected. Input = 8192. Output = 2048.
     fc1_W = tf.Variable(tf.truncated_normal(shape=(8192, 2048), mean = mu, stddev = sigma))
-   # fc1_b = tf.Variable(tf.zeros(2048))
     fc1   = tf.matmul(fc0, fc1_W) 
     print("fc1 before bn", fc1.shape)
     fc1_bn = tf.contrib.layers.batch_norm( fc1, center=True, scale=True, is_training=is_training)
     
-    # SOLUTION: Activation.
     fc1_bn    = tf.nn.relu(fc1_bn)
     fc1_bn = tf.nn.dropout(fc1_bn, keep_prob3)
     print("fc1_bn shape", fc1_bn.shape)
 
-    # SOLUTION: Layer 4: Fully Connected. Input = 120. Output = 84.
     fc2_W  = tf.Variable(tf.truncated_normal(shape=(2048, 512), mean = mu, stddev = sigma))
-    #fc2_b  = tf.Variable(tf.zeros(512))
     fc2    = tf.matmul(fc1_bn, fc2_W) 
     print("fc2 shape", fc2.shape)
     fc2_bn =  tf.contrib.layers.batch_norm( fc2, center=True, scale=True, is_training=is_training)
-    #fc2_bn = fc2
-    
-    # SOLUTION: Activation.
     fc2_bn    = tf.nn.relu(fc2_bn)
     fc2_bn = tf.nn.dropout(fc2_bn, keep_prob4)
 
-    # SOLUTION: Layer 5: Fully Connected. Input = 84. Output = 43.
     fc3_W  = tf.Variable(tf.truncated_normal(shape=(512, 43), mean = mu, stddev = sigma))
     fc3_b  = tf.Variable(tf.zeros(43))
     logits = tf.matmul(fc2_bn, fc3_W) + fc3_b
     
     return logits            
-'''
  
 
 ### Test a Model on New Images
@@ -351,43 +307,43 @@ def LeNet(x, is_training):
 
 Here are five German traffic signs that I found on the web:
 
-![alt text][image4] ![alt text][image5] ![alt text][image6] 
-![alt text][image7] ![alt text][image8]
+![alt text][/new-image/c1.jpg] ![alt text][/new-image/c11.jpg] ![alt text][/new-image/c14.jpg] 
+![alt text][/new-image/c15.jpg] ![alt text][/new-image/c18.jpg] ![alt text][/new-image/c20.jpg]
+![alt text][/new-image/c23.jpg] ![alt text][/new-image/c24.jpg] ![alt text][/new-image/c27.jpg]
 
-The first image might be difficult to classify because ...
+They are cut with ROI and resized to 32*32*3.
+![alt text](/examples/newimages.png)
+
+The 5th and 6th image might be difficult to classify because they are tilted and not facing to the front. The last one is also difficult because it has a line of text over it.
+The 3rd is also not easy, since there are a lot of noises around the board. The 8th is not easy because after resizing/shrinking, the meaning part is not clear.
 
 #### 2. Discuss the model's predictions on these new traffic signs and compare the results to predicting on the test set. At a minimum, discuss what the predictions were, the accuracy on these new predictions, and compare the accuracy to the accuracy on the test set (OPTIONAL: Discuss the results in more detail as described in the "Stand Out Suggestions" part of the rubric).
 
 Here are the results of the prediction:
 
+
 | Image			        |     Prediction	        					| 
 |:---------------------:|:---------------------------------------------:| 
-| Stop Sign      		| Stop sign   									| 
-| U-turn     			| U-turn 										|
-| Yield					| Yield											|
-| 100 km/h	      		| Bumpy Road					 				|
-| Slippery Road			| Slippery Road      							|
+| Right-of-way          | Right-of-way  								| 
+| Pedestrians  			| Pedestrians   								|
+| Stop  	      		| Stop          				 				|
+| Speed limit (30km/h)	| Speed limit (30km/h)  						|
+| Dangerous curve to the right| Speed limit (120km/h)	            	|
+| Road narrows on the right |General caution                            |
+| General caution       | General caution                               |
+| Slippery road         | Slippery road                                 |
+| No vehicles           | Speed limit (30km/h)	                        |
 
-
-The model was able to correctly guess 4 of the 5 traffic signs, which gives an accuracy of 80%. This compares favorably to the accuracy on the test set of ...
+The model was able to correctly guess 6 of the 9 traffic signs, which gives an accuracy of 67%. This compares favorably to the accuracy on the test set of 0.944.
+The 6th image, 'Road narrows on the right' is  easy to recognized as 'General caution', since they are very similar.
 
 #### 3. Describe how certain the model is when predicting on each of the five new images by looking at the softmax probabilities for each prediction. Provide the top 5 softmax probabilities for each image along with the sign type of each probability. (OPTIONAL: as described in the "Stand Out Suggestions" part of the rubric, visualizations can also be provided such as bar charts)
 
-The code for making predictions on my final model is located in the 11th cell of the Ipython notebook.
+The code for making predictions on my final model is located in step 3 of the Ipython notebook.
 
-For the first image, the model is relatively sure that this is a stop sign (probability of 0.6), and the image does contain a stop sign. The top five soft max probabilities were
-
-| Probability         	|     Prediction	        					| 
-|:---------------------:|:---------------------------------------------:| 
-| .60         			| Stop sign   									| 
-| .20     				| U-turn 										|
-| .05					| Yield											|
-| .04	      			| Bumpy Road					 				|
-| .01				    | Slippery Road      							|
-
-
-For the second image ... 
 
 ### (Optional) Visualizing the Neural Network (See Step 4 of the Ipython notebook for more details)
 ####1. Discuss the visual output of your trained network's feature maps. What characteristics did the neural network use to make classifications?
 
+The first hidden layer is more apparent in the feature map. They are the outer boundary of the sign, and the inner shapes.
+The second hidden convolution layer shows more simple shapes, like two parallel tilted lines in FeatureMap 10, a tilted line in FeatureMap 26, and a vertical line in FeatureMap 12.
